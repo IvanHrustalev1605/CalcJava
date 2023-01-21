@@ -3,57 +3,66 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Calculyator {
-    public static void main(String[] input) throws IOException, NumberFormatException {
+    public static void main(String[] input) throws IOException, NumberFormatException, ArrayIndexOutOfBoundsException {
 
         System.out.println("Введите выражение для вычисления: ");
         cutInput str = new cutInput();
-        try {
-            if (str.check()) {
-                Roman roman = new Roman();
-                int el1 = roman.toArabic(str.cutStrInOper()[0]);
-                int el2 = roman.toArabic(str.cutStrInOper()[1]);
-                switch (str.findOperation()) {
-                    case "+":
-                        System.out.println(roman.CountPlus(el1, el2));
-                        break;
-                    case "-":
-                        System.out.println(roman.CountMinus(el1, el2));
-                        break;
-                    case "*":
-                        System.out.println(roman.CountMult(el1, el2));
-                        break;
-                    case "/":
-                        System.out.println(roman.CountDel(el1, el2));
-                        break;
-                }
-            } else {
-                Arab arab = new Arab();
-                int el1 = Integer.parseInt(str.cutStrInOper()[0]);
-                int el2 = Integer.parseInt(str.cutStrInOper()[1]);
-                if (el1 < 0 || el1 > 10 || el2 < 0 || el2 > 10){
-                    throw new IOException ("Введите числа от 0 до 10");
-                }
-                else {
+        if (str.cutStrInOper().length > 2){
+            throw new IOException("Не более двух операндов!");
+        }
+        else {
+            try {
+                if (str.check()) {
+                    Roman roman = new Roman();
+                    int el1 = roman.toArabic(str.cutStrInOper()[0]);
+                    int el2 = roman.toArabic(str.cutStrInOper()[1]);
                     switch (str.findOperation()) {
                         case "+":
-                            System.out.println(arab.CountPlus(el1, el2));
+                            System.out.println(roman.CountPlus(el1, el2));
                             break;
                         case "-":
-                            System.out.println(arab.CountMinus(el1, el2));
+                            System.out.println(roman.CountMinus(el1, el2));
                             break;
                         case "*":
-                            System.out.println(arab.CountMult(el1, el2));
+                            System.out.println(roman.CountMult(el1, el2));
                             break;
                         case "/":
-                            System.out.println(arab.CountDel(el1, el2));
+                            System.out.println(roman.CountDel(el1, el2));
                             break;
                     }
-                }
+                } else {
+                    Arab arab = new Arab();
+                    int el1 = Integer.parseInt(str.cutStrInOper()[0]);
+                    int el2 = Integer.parseInt(str.cutStrInOper()[1]);
+                    if (el1 < 0 || el1 > 10 || el2 < 0 || el2 > 10){
+                        throw new IOException ("Введите числа от 0 до 10");
+                    }
+                    else {
+                        switch (str.findOperation()) {
+                            case "+":
+                                System.out.println(arab.CountPlus(el1, el2));
+                                break;
+                            case "-":
+                                System.out.println(arab.CountMinus(el1, el2));
+                                break;
+                            case "*":
+                                System.out.println(arab.CountMult(el1, el2));
+                                break;
+                            case "/":
+                                System.out.println(arab.CountDel(el1, el2));
+                                break;
+                        }
+                    }
 
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Проверьте введеные данные!");
             }
-        } catch (NumberFormatException e) {
-            System.out.println("Проверьте введеные данные!");
+            catch (ArrayIndexOutOfBoundsException e){
+                System.out.println("Cтрока не является математической операцией ");
+            }
         }
+
     }
 }
 
@@ -80,6 +89,8 @@ public class Calculyator {
         }
     }
     class Roman {
+        static int numbers[]  =     {   1,   4,   5,    9,  10,  50, 100};
+        static String letters[]  =  { "I", "IV", "V", "IX", "X", "L", "C"};
         public int toArabic(String value){//перевод из римских в арабские
             if(value.equals("I")) return 1;
             if(value.equals("II")) return 2;
@@ -94,17 +105,25 @@ public class Calculyator {
             return 0;
         }
         public String toRome(int value){//перевод из римских в арабские
-            if(value == 1) return "I";
-            if(value == 2) return "II";
-            if(value == 3) return "III";
-            if(value == 4) return "IV";
-            if(value == 5) return "V";
-            if(value == 6) return "VI";
-            if(value == 7) return "VII";
-            if(value == 8) return "VIII";
-            if(value == 9) return "IX";
-            if(value == 10) return "X";
-            return "";
+            var keys = new String[] {"C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
+            var vals = new int[] { 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+
+            StringBuilder ret = new StringBuilder();
+            int ind = 0;
+
+            while(ind < keys.length)
+            {
+                while(value >= vals[ind])
+                {
+                    var d = value / vals[ind];
+                    value = value % vals[ind];
+                    for(int i=0; i<d; i++)
+                        ret.append(keys[ind]);
+                }
+                ind++;
+            }
+
+            return ret.toString();
         }
 
         String CountPlus(int a, int b) {
@@ -172,8 +191,6 @@ public class Calculyator {
 
 
     }
-
-
 
 
 
